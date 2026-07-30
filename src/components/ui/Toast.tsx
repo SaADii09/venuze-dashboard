@@ -1,61 +1,122 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { XMarkIcon, CheckCircleIcon, ExclamationCircleIcon, InformationCircleIcon } from "@heroicons/react/24/outline";
+import {
+  useState,
+  useEffect,
+  createContext,
+  useContext,
+  useCallback,
+  type ReactNode,
+} from "react";
+import {
+  XMarkIcon,
+  CheckCircleIcon,
+  ExclamationCircleIcon,
+  InformationCircleIcon,
+} from "@heroicons/react/24/outline";
 import { cn } from "@/lib/utils";
 
-interface ToastProps {
+type ToastType = "success" | "error" | "info" | "warning";
+
+interface Toast {
   id: string;
-  type: "success" | "error" | "info" | "warning";
+  type: ToastType;
   message: string;
-  onClose: (id: string) => void;
   duration?: number;
 }
 
-export function Toast({ id, type, message, onClose, duration = 5000 }: ToastProps) {
-  const [isVisible, setIsVisible] = useState(true);
+interface ToastContextType {
+  toast: (type: ToastType, message: string, duration?: number) => void;
+}
 
+const ToastContext = createContext<ToastContextType | undefined>(undefined);
+
+export function ToastProvider({ children }: { children: ReactNode }) {
+  const [toasts, setToasts] = useState<Toast[]>([]);
+
+  const addToast = useCallback(
+    (type: ToastType, message: string, duration = 5000) => {
+      const id = Math.random().toString(36).substring(7);
+      setToasts((prev) => [...prev, { id, type, message, duration }]);
+    },
+    []
+  );
+
+  const removeToast = useCallback((id: string) => {
+    setToasts((prev) => prev.filter((toast) => toast.id !== id));
+  }, []);
+
+  return (
+    <ToastContext.Provider value={{ toast: addToast }}>
+      {children}
+      <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2">
+        {toasts.map((t) => (
+          <ToastItem key={t.id} toast={t} onRemove={removeToast} />
+        ))}
+      </div>
+    </ToastContext.Provider>
+  );
+}
+
+export function useToast() {
+  const context = useContext(ToastContext);
+  if (!context) {
+    throw new Error("useToast must be used within a ToastProvider");
+  }
+  return context;
+}
+
+function ToastItem({
+  toast,
+  onRemove,
+}: {
+  toast: Toast;
+  onRemove: (id: string) => void;
+}) {
   useEffect(() => {
     const timer = setTimeout(() => {
-      setIsVisible(false);
-      setTimeout(() => onClose(id), 300);
-    }, duration);
-
+      onRemove(toast.id);
+    }, toast.duration);
     return () => clearTimeout(timer);
-  }, [duration, id, onClose]);
+  }, [toast, onRemove]);
 
   const icons = {
-    success: <CheckCircleIcon className="h-5 w-5 text-green-400" />,
-    error: <ExclamationCircleIcon className="h-5 w-5 text-red-400" />,
-    info: <InformationCircleIcon className="h-5 w-5 text-blue-400" />,
-    warning: <ExclamationCircleIcon className="h-5 w-5 text-yellow-400" />,
+    success: (
+      <CheckCircleIcon className="h-5 w-5 text-green-400" />
+    ),
+    error: (
+      <ExclamationCircleIcon className="h-5 w-5 text-red-400" />
+    ),
+    info: (
+      <InformationCircleIcon className="h-5 w-5 text-blue-400" />
+    ),
+    warning: (
+      <ExclamationCircleIcon className="h-5 w-5 text-yellow-400" />
+    ),
   };
 
-  const backgrounds = {
-    success: "bg-green-50 border-green-200",
-    error: "bg-red-50 border-red-200",
-    info: "bg-blue-50 border-blue-200",
-    warning: "bg-yellow-50 border-yellow-200",
+  const bgColors = {
+    success: "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800",
+    error: "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800",
+    info: "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800",
+    warning: "bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800",
   };
 
   return (
     <div
       className={cn(
-        "fixed bottom-4 right-4 z-50 flex items-center p-4 rounded-card border shadow-lg transition-all duration-300",
-        backgrounds[type],
-        isVisible ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
+        "flex items-center gap-3 p-4 rounded-card border shadow-lg animate-slide-in min-w-[300px] max-w-[400px]",
+        bgColors[toast.type]
       )}
     >
-      <div className="flex items-center space-x-3">
-        {icons[type]}
-        <p className="text-sm font-medium text-gray-900">{message}</p>
-      </div>
+      {icons[toast.type]}
+      <p className="text-sm font-medium text-gray-900 dark:text-white flex-1">
+        {toast.message}
+      </p>
       <button
-        onClick={() => {
-          setIsVisible(false);
-          setTimeout(() => onClose(id), 300);
-        }}
-        className="ml-4 text-gray-400 hover:text-gray-500"
+        onClick={() => onRemove(toast.id)}
+        className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+        aria-label="Close"
       >
         <XMarkIcon className="h-4 w-4" />
       </button>
@@ -63,42 +124,35 @@ export function Toast({ id, type, message, onClose, duration = 5000 }: ToastProp
   );
 }
 
-interface ToastItem {
+// Legacy exports for backward compatibility
+export function Toast({
+  id,
+  type,
+  message,
+  onClose,
+  duration = 5000,
+}: {
   id: string;
-  type: "success" | "error" | "info" | "warning";
+  type: ToastType;
   message: string;
+  onClose: (id: string) => void;
+  duration?: number;
+}) {
+  return <ToastItem toast={{ id, type, message, duration }} onRemove={onClose} />;
 }
 
 export function ToastContainer({
   toasts,
   onClose,
 }: {
-  toasts: ToastItem[];
+  toasts: { id: string; type: ToastType; message: string }[];
   onClose: (id: string) => void;
 }) {
   return (
-    <div className="fixed bottom-4 right-4 z-50 space-y-2">
+    <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2">
       {toasts.map((toast) => (
         <Toast key={toast.id} {...toast} onClose={onClose} />
       ))}
     </div>
   );
-}
-
-export function useToast() {
-  const [toasts, setToasts] = useState<ToastItem[]>([]);
-
-  const addToast = (
-    type: "success" | "error" | "info" | "warning",
-    message: string
-  ) => {
-    const id = Math.random().toString(36).substr(2, 9);
-    setToasts((prev) => [...prev, { id, type, message }]);
-  };
-
-  const removeToast = (id: string) => {
-    setToasts((prev) => prev.filter((toast) => toast.id !== id));
-  };
-
-  return { toasts, addToast, removeToast };
 }
