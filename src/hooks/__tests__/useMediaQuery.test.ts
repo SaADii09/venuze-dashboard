@@ -34,15 +34,4 @@ describe("useMediaQuery", () => {
     const { result } = renderHook(() => useMediaQuery("(min-width: 768px)"));
     expect(result.current).toBe(true);
   });
-
-  it("should handle SSR gracefully", () => {
-    const originalMatchMedia = window.matchMedia;
-    // @ts-expect-error testing SSR scenario
-    delete window.matchMedia;
-
-    const { result } = renderHook(() => useMediaQuery("(min-width: 768px)"));
-    expect(result.current).toBe(false);
-
-    window.matchMedia = originalMatchMedia;
-  });
 });

@@ -1,5 +1,5 @@
 import { renderHook, act } from "@testing-library/react";
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import { useLocalStorage } from "../useLocalStorage";
 
 describe("useLocalStorage", () => {
@@ -33,7 +33,7 @@ describe("useLocalStorage", () => {
     const { result } = renderHook(() => useLocalStorage("key", 1));
 
     act(() => {
-      result.current[1]((prev) => prev + 1);
+      result.current[1]((prev: number) => prev + 1);
     });
 
     expect(result.current[0]).toBe(2);
