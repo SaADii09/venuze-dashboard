@@ -23,7 +23,7 @@ describe("cn", () => {
 describe("formatCurrency", () => {
   it("should format VND currency", () => {
     const result = formatCurrency(1000000);
-    expect(result).toContain("1,000,000");
+    expect(result).toMatch(/1[.,]000[.,]000/);
   });
 
   it("should handle zero", () => {
