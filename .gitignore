@@ -48,7 +48,7 @@ coverage/
 *.local
 
 # Documentation
-/docs
+docs/
 
 # Config files
 opencode.json
