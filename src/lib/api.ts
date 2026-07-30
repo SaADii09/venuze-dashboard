@@ -9,6 +9,13 @@ const api = axios.create({
 
 function getStoredToken(): string | null {
   if (typeof window === "undefined") return null;
+
+  const cookieToken = document.cookie
+    .split("; ")
+    .find((c) => c.startsWith("auth-token="))
+    ?.split("=")[1];
+  if (cookieToken) return cookieToken;
+
   try {
     const raw = localStorage.getItem("auth-storage");
     if (!raw) return null;
@@ -22,6 +29,7 @@ function getStoredToken(): string | null {
 function clearAuthStorage() {
   if (typeof window === "undefined") return;
   localStorage.removeItem("auth-storage");
+  document.cookie = "auth-token=; path=/; max-age=0";
 }
 
 api.interceptors.request.use(
@@ -42,6 +50,9 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       clearAuthStorage();
+      if (typeof window !== "undefined") {
+        window.location.href = "/login";
+      }
     }
     return Promise.reject(error);
   }

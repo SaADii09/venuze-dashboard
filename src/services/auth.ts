@@ -15,6 +15,7 @@ export const authService = {
   async logout(): Promise<void> {
     if (typeof window !== "undefined") {
       localStorage.removeItem("auth-storage");
+      document.cookie = "auth-token=; path=/; max-age=0";
     }
   },
 };

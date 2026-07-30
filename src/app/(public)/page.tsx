@@ -63,7 +63,7 @@ const destinations = [
 
 export default function HomePage() {
   const [activeVenueTab, setActiveVenueTab] = useState("GALLERY");
-  const [activeCategoryTab, setActiveCategoryTab] = useState("Event");
+  const [activeCategoryTab, setActiveCategoryTab] = useState("Venue");
 
   return (
     <div className="bg-white">
@@ -84,26 +84,28 @@ export default function HomePage() {
             {/* Tabs */}
             <div className="flex items-center justify-center gap-2 mb-4">
               <button
-                onClick={() => setActiveCategoryTab("Event")}
+                onClick={() => setActiveCategoryTab("Venue")}
                 className={`flex items-center gap-2 px-6 py-2 rounded-pill text-sm font-medium transition-colors ${
-                  activeCategoryTab === "Event"
-                    ? "bg-primary-500 text-white"
-                    : "bg-white text-dark-brown"
-                }`}
-              >
-                <CalendarDaysIcon className="w-4 h-4" />
-                Event
-              </button>
-              <button
-                onClick={() => setActiveCategoryTab("Venues")}
-                className={`flex items-center gap-2 px-6 py-2 rounded-pill text-sm font-medium transition-colors ${
-                  activeCategoryTab === "Venues"
+                  activeCategoryTab === "Venue"
                     ? "bg-primary-500 text-white"
                     : "bg-white text-dark-brown"
                 }`}
               >
                 <MapPinIcon className="w-4 h-4" />
-                Venues
+                Venue
+              </button>
+              <button
+                onClick={() => setActiveCategoryTab("Vendors")}
+                className={`flex items-center gap-2 px-6 py-2 rounded-pill text-sm font-medium transition-colors ${
+                  activeCategoryTab === "Vendors"
+                    ? "bg-primary-500 text-white"
+                    : "bg-white text-dark-brown"
+                }`}
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                </svg>
+                Vendors
               </button>
             </div>
 
@@ -192,7 +194,10 @@ export default function HomePage() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-dark-brown/80 via-dark-brown/20 to-transparent" />
                   <div className="absolute bottom-0 left-0 right-0 p-5">
-                    <h3 className="text-lg font-semibold text-white">{cat.name}</h3>
+                    <h3 className="text-lg font-semibold text-white mb-2">{cat.name}</h3>
+                    <span className="inline-block text-xs font-semibold text-white border border-white rounded-button px-3 py-1.5 hover:bg-white hover:text-dark-brown transition-colors">
+                      View details
+                    </span>
                   </div>
                 </Link>
               ))}
@@ -287,7 +292,10 @@ export default function HomePage() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-dark-brown/80 via-dark-brown/20 to-transparent" />
                   <div className="absolute bottom-0 left-0 right-0 p-5">
-                    <h3 className="text-lg font-semibold text-white">{vendor.name}</h3>
+                    <h3 className="text-lg font-semibold text-white mb-2">{vendor.name}</h3>
+                    <span className="inline-block text-xs font-semibold text-white border border-white rounded-button px-3 py-1.5 hover:bg-white hover:text-dark-brown transition-colors">
+                      View details
+                    </span>
                   </div>
                 </Link>
               ))}

@@ -5,10 +5,19 @@ import { useRouter } from "next/navigation";
 import { useLogin } from "@/hooks/useLogin";
 import { useUser } from "@/hooks/useUser";
 import { useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 export function useAuth() {
   const router = useRouter();
-  const { token, user: storedUser, isAuthenticated, setToken, setUser, logout: storeLogout } = useAuthStore();
+  const queryClient = useQueryClient();
+  const {
+    token,
+    user: storedUser,
+    isAuthenticated,
+    setToken,
+    setUser,
+    logout: storeLogout,
+  } = useAuthStore();
 
   const loginMutation = useLogin();
   const { data: freshUser } = useUser();
@@ -29,6 +38,8 @@ export function useAuth() {
 
   const logout = () => {
     storeLogout();
+    queryClient.clear();
+    document.cookie = "auth-token=; path=/; max-age=0";
     router.push("/login");
   };
 

@@ -6,16 +6,16 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat("vi-VN", {
+  return new Intl.NumberFormat("en-GB", {
     style: "currency",
-    currency: "VND",
+    currency: "GBP",
     maximumFractionDigits: 0,
   }).format(amount);
 }
 
 export function formatDate(date: string | Date): string {
   const d = typeof date === "string" ? new Date(date) : date;
-  return new Intl.DateTimeFormat("vi-VN", {
+  return new Intl.DateTimeFormat("en-GB", {
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
