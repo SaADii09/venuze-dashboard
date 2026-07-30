@@ -11,6 +11,17 @@ interface AuthState {
   logout: () => void;
 }
 
+function setCookie(name: string, value: string, days: number) {
+  if (typeof document === "undefined") return;
+  const expires = new Date(Date.now() + days * 864e5).toUTCString();
+  document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Lax`;
+}
+
+function removeCookie(name: string) {
+  if (typeof document === "undefined") return;
+  document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
+}
+
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
@@ -19,6 +30,7 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
 
       setToken: (token: string) => {
+        setCookie("auth-token", token, 7);
         set({ token, isAuthenticated: true });
       },
 
@@ -27,6 +39,7 @@ export const useAuthStore = create<AuthState>()(
       },
 
       logout: () => {
+        removeCookie("auth-token");
         set({
           token: null,
           user: null,
