@@ -3,8 +3,13 @@ export interface User {
   email: string;
   first_name: string;
   last_name: string;
-  avatar: string;
+  avatar?: string;
+  role?: UserRole;
+  created_at?: string;
+  updated_at?: string;
 }
+
+export type UserRole = "user" | "admin" | "vendor";
 
 export interface LoginRequest {
   email: string;
@@ -13,6 +18,14 @@ export interface LoginRequest {
 
 export interface LoginResponse {
   token: string;
+  user?: User;
+}
+
+export interface UserProfile extends User {
+  phone?: string;
+  address?: string;
+  bookings?: number;
+  favoriteVenues?: number[];
 }
 
 export interface AuthState {
