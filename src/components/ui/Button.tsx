@@ -20,6 +20,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       rightIcon,
       disabled,
       children,
+      "aria-label": ariaLabel,
       ...props
     },
     ref
@@ -28,7 +29,8 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       "inline-flex items-center justify-center font-medium rounded-button transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed";
 
     const variants = {
-      primary: "bg-primary-500 text-white hover:bg-primary-600 focus:ring-primary-500",
+      primary:
+        "bg-primary-500 text-white hover:bg-primary-600 focus:ring-primary-500",
       secondary:
         "border border-gray-300 bg-white text-dark-brown hover:bg-gray-50 focus:ring-primary-500",
       ghost: "text-dark-brown hover:bg-primary-50 focus:ring-primary-500",
@@ -46,6 +48,8 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         className={cn(baseStyles, variants[variant], sizes[size], className)}
         disabled={disabled || isLoading}
+        aria-label={ariaLabel}
+        aria-busy={isLoading}
         {...props}
       >
         {isLoading ? (
